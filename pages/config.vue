@@ -259,9 +259,10 @@
 
   .root__warpper {
     min-width: 400px;
-    overflow: hidden;
     margin: 0 auto;
     padding: 10px;
+    height: 480px;
+    overflow: scroll;
   }
 
   .root__item {

@@ -1,6 +1,8 @@
 <template>
-  <div class="container"
-       ref="container"></div>
+  <div>
+    <div class="container"
+         ref="container"></div>
+  </div>
 
 </template>
 
@@ -43,7 +45,7 @@
 
       this.questions = JSON.parse(questions)
 
-      this.shuffle(this.questions.left.concat(this.questions.useless))
+      this.shuffle(this.questions.left.concat(this.questions.right))
 
       // 预加载图片
       const Assets = AssetsFectory()
@@ -65,12 +67,13 @@
         questions: this.questions,
         images: { bg, titleBg },
         title: this.questions.title,
+        ticker: this.gameMain.ticker
       })
 
       // 插入背景
       this.stage.addChild(exportScence)
-      this.questionsSubmitCanvas = this.createSubmitButton()
-      this.questionsPanelCanvas = this.createPanel('panel')
+      //   this.questionsSubmitCanvas = this.createSubmitButton()
+      //   this.questionsPanelCanvas = this.createPanel('panel')
     },
     methods: {
       createPanel (type = 'panel') {
@@ -203,3 +206,14 @@
     }
   }
 </script>
+
+<style scoped>
+  .root__time {
+    position: fixed;
+    right: 0;
+    top: 30px;
+    width: 30%;
+    height: 40%;
+    font-size: 0.453333rem;
+  }
+</style>

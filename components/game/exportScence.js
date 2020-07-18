@@ -5,7 +5,13 @@ export default class ExportScence extends Hilo.Container {
     super(properties)
 
     this.initBackground(properties)
+
+    this.initTime(properties)
   }
+
+  timeCount = 0
+  timeStart = true
+
   initBackground (properties) {
     // 整体背景
     new Hilo.Bitmap({
@@ -18,28 +24,58 @@ export default class ExportScence extends Hilo.Container {
 
     // 时间背景
     new Hilo.Bitmap({
-      x: (1920 - 484) / 2,
-      y: 40,
+      x: 0,
+      y: 0,
       image: properties.images.titleBg,
-      rect: [0, 0, 484, 146,],
+      rect: [0, 0, 1920, 146,],
       visible: true
     }).addTo(this)
 
-    // 时间倒计时
+    // 标题
     new Text({
       text: properties.title,
-      fontSize: properties.title.length < 9 ? 45 : 45 - Math.round(properties.title.length / 4) * 5,
+      fontSize: 65,
       bold: true,
       textAlign: 'center',
-      textVAlign: 'middle',
-      height: 151,
+      height: 110,
       visible: true,
-      cc: 3,
       alpha: 1,
-      reTextWidth: 484,
-      x: (1920 - 484) / 2,
-      y: properties.title.length < 9 ? 20 : 20 + (45 - (45 - Math.round(properties.title.length / 4) * 5)) / 2,
+      reTextWidth: 1600,
+      x: (1920 - 1600) / 2,
+      y: 50,
       color: '#ffffff',
     }).addTo(this)
+  }
+
+  initTime (properties) {
+
+    const time = new Text({
+      text: this.getTime(this.timeCount),
+      fontSize: 55,
+      bold: true,
+      textAlign: 'center',
+      height: 110,
+      visible: true,
+      alpha: 1,
+      reTextWidth: 230,
+      x: (1920 - 360),
+      y: 55,
+      color: '#975f21',
+    }).addTo(this)
+
+    properties.ticker.interval(() => {
+      if (this.timeStart) {
+        this.timeCount++
+        time.text = this.getTime(this.timeCount)
+      }
+    }, 1000)
+  }
+
+  getTime (time = 0) {
+    let m = Math.floor(time / 60) + ''
+    m = m.padStart(2, '0')
+    let s = time % 60 + ''
+    s = s.padStart(2, '0')
+    return `${m} : ${s}`
   }
 }
