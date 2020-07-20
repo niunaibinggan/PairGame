@@ -4,23 +4,20 @@ import { forEach } from 'lodash'
 export default class ResultPanel extends Hilo.Container {
   constructor(properties) {
     super(properties)
-
-
     this.initPanel(properties)
   }
-
-  setAnswer = []
 
   blockRect = [0, 0, 150, 150]
   blockSelected = [0, 0, 163, 162]
   blockSelectedError = [0, 0, 170, 172]
   blockSelectedRight = [0, 0, 178, 176]
+  blockSelectedErrorLine = [0, 0, 477, 144]
 
   setAnswer = []
 
   currentSelected = [...new Array(2)]
 
-  rightContainer = null
+  lineContainer = null
 
   target = 6
 
@@ -36,6 +33,11 @@ export default class ResultPanel extends Hilo.Container {
       width: 1050,
       height: 700,
     }).addTo(this)
+
+    this.lineContainer = new Hilo.Container({
+      x: 0,
+      y: (700 - (columns * this.blockRect[2] + (columns - 1) * distance)) / 2,
+    }).addTo(panel)
 
     const panelContainer = new Hilo.Container({
       x: 0,
@@ -218,7 +220,10 @@ export default class ResultPanel extends Hilo.Container {
                   { alpha: 0 },
                   {
                     duration: 150,
-                    onComplete () { that.currentSelected = that.currentSelected.map(item => item = undefined) }
+                    onComplete () {
+                      that.setAnswer.push(that.currentSelected[0].questionId)
+                      that.currentSelected = that.currentSelected.map(item => item = undefined)
+                    }
                   }
                 )
               }
@@ -227,8 +232,66 @@ export default class ResultPanel extends Hilo.Container {
         })
 
       } else {
-        console.log(this.currentSelected[1].currentCon)
-        // that.currentSelected[1].currentCon.alpha = 0
+        const line1 = this.currentSelected[0].parent
+        const line2 = this.currentSelected[1].parent
+
+        if (line1.x === line2.x) {
+          // 创建闪电
+          new Hilo.Bitmap({
+            image: selectedBlockErrorLine,
+            width: Math.abs(line1.y - line2.y),
+            height: 144,
+            rect: [0, 0, 477 / 2, 144],
+            visible: true,
+            x: line1.x + this.blockRect[2] / 4 + 144,
+            y: Math.min(...this.currentSelected.map(item => item.parent.y)) + this.blockRect[3] / 4,
+            alpha: 0.3,
+            rotation: 90,
+          }).addTo(this.lineContainer)
+        }
+
+        if (line1.y === line2.y) {
+          // 创建闪电
+          new Hilo.Bitmap({
+            image: selectedBlockErrorLine,
+            width: Math.abs(line1.x - line2.x),
+            height: 144,
+            rect: [0, 0, 477 / 2, 144],
+            visible: true,
+            x: Math.min(...this.currentSelected.map(item => item.parent.x)) + this.blockRect[2] / 4,
+            y: line1.x - this.blockRect[2] / 4,
+            alpha: 0.3,
+          }).addTo(this.lineContainer)
+        }
+
+        if (line1.x !== line2.x && line1.y !== line2.y) {
+          const startX = line1.x > line2.x ? line2.x : line1.x
+          const startY = line1.y > line2.y ? line2.y : line1.y
+
+          new Hilo.Bitmap({
+            image: selectedBlockErrorLine,
+            width: Math.abs(line1.x - line2.x),
+            height: 144,
+            rect: [0, 0, 477 / 2, 144],
+            visible: true,
+            x: startX + this.blockRect[2] / 4,
+            y: (startX !== line1.x ? line1.y : line2.y) - this.blockRect[3] / 4,
+            alpha: 0.3,
+          }).addTo(this.lineContainer)
+
+          new Hilo.Bitmap({
+            image: selectedBlockErrorLine,
+            width: Math.abs(line1.y - line2.y) * 1.4,
+            height: 144,
+            rect: [0, 0, 477 / 2, 144],
+            visible: true,
+            x: startX + this.blockRect[2] / 4 + 144,
+            y: startY,
+            alpha: 0.3,
+            rotation: 90,
+          }).addTo(this.lineContainer)
+
+        }
         Hilo.Tween.to(
           that.currentSelected[0].errorCon,
           {
@@ -242,6 +305,7 @@ export default class ResultPanel extends Hilo.Container {
             onComplete () {
               block.alpha = 0
               that.currentSelected[1] = undefined
+              that.lineContainer.removeAllChildren()
             }
           }
         )
