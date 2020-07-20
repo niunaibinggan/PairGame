@@ -407,4 +407,7 @@
     background: url("../static/answer.png") no-repeat center center;
     background-size: 100% 100%;
   }
+  canvas {
+    left: 0;
+  }
 </style>

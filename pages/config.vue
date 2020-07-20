@@ -206,7 +206,6 @@
         let setQuestion = this.questions
         try {
           const thumbnail = await save(setQuestion)
-          console.log(thumbnail)
           await this.$testsave(thumbnail, JSON.stringify(setQuestion))
         } catch (error) {
           localStorage.setItem('questionsConfig', JSON.stringify(setQuestion))
