@@ -14,6 +14,7 @@ export default class ResultPanel extends Hilo.Container {
   blockSelectedErrorLine = [0, 0, 477, 144]
 
   setAnswer = []
+  selectedQuestionsId = null
 
   currentSelected = [...new Array(2)]
 
@@ -203,6 +204,8 @@ export default class ResultPanel extends Hilo.Container {
     if (this.currentSelected.every(item => item)) {
 
       if (this.currentSelected[0].questionId === this.currentSelected[1].questionId) {
+        this.setAnswer.push(this.currentSelected[0].questionId)
+        this.selectedQuestionsId = this.currentSelected[0].questionId
         this.currentSelected.forEach(item => {
           Hilo.Tween.to(
             item.rightCon,
@@ -221,7 +224,6 @@ export default class ResultPanel extends Hilo.Container {
                   {
                     duration: 150,
                     onComplete () {
-                      that.setAnswer.push(that.currentSelected[0].questionId)
                       that.currentSelected = that.currentSelected.map(item => item = undefined)
                     }
                   }
@@ -259,7 +261,7 @@ export default class ResultPanel extends Hilo.Container {
             rect: [0, 0, 477 / 2, 144],
             visible: true,
             x: Math.min(...this.currentSelected.map(item => item.parent.x)) + this.blockRect[2] / 4,
-            y: line1.x - this.blockRect[2] / 4,
+            y: line1.y - this.blockRect[2] / 4,
             alpha: 0.3,
           }).addTo(this.lineContainer)
         }
@@ -305,6 +307,7 @@ export default class ResultPanel extends Hilo.Container {
             onComplete () {
               block.alpha = 0
               that.currentSelected[1] = undefined
+              that.selectedQuestionsId = null
               that.lineContainer.removeAllChildren()
             }
           }
