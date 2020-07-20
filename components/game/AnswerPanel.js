@@ -6,9 +6,7 @@ export default class AnswerPanel extends Hilo.Container {
     this.text = properties.text
     this.initAnswerPanel(properties)
   }
-
   text = ''
-
   initAnswerPanel (properties) {
     // 整体背景
     new Hilo.Bitmap({
@@ -20,7 +18,7 @@ export default class AnswerPanel extends Hilo.Container {
     }).addTo(this)
 
     // 标题
-    new Text({
+    const textContainer = new Text({
       text: this.text,
       fontSize: 65,
       bold: true,
@@ -33,5 +31,10 @@ export default class AnswerPanel extends Hilo.Container {
       y: 30,
       color: '#ffffff',
     }).addTo(this)
+
+    properties.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
+      const setAnswer = properties.questionsPanelCanvas.setAnswer
+      textContainer.text = `${setAnswer.length} / ${properties.questionsLength}`
+    })
   }
 }

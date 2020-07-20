@@ -32,8 +32,36 @@
           </span>
         </li>
 
+        <li class="answer-item"
+            v-for="(item,index) in errorAnswerLeft"
+            :key="item.id">
+          <span class="answer-item__icon-error"></span>
+          <span class="answer-item__image">
+            <span class="answer-item__image-text"
+                  v-if="item.type === 'text'"
+                  :style="fontStyle">{{item.text}}</span>
+            <el-image v-if="item.type=== 'image'"
+                      class="answer-item__image-img"
+                      :src="item.text"
+                      fit="contain"></el-image>
+          </span>
+          <span class="answer-item__line"></span>
+          <span class="answer-item__image">
+            <span class="answer-item__image-text"
+                  v-if="errorAnswerRight[index].type === 'text'"
+                  :style="fontStyle">{{errorAnswerRight[index].text}}</span>
+            <el-image v-if="errorAnswerRight[index].type=== 'image'"
+                      class="answer-item__image-img"
+                      :src="errorAnswerRight[index].text"
+                      fit="contain"></el-image>
+          </span>
+        </li>
       </ul>
     </div>
+
+    <div v-if="visibleModel"
+         :class="isAllRight ?  'answer-model__right' :'answer-model__error'"
+         :style="modleStyle"></div>
   </div>
 
 </template>
@@ -45,7 +73,7 @@
   import ExportScence from '~/components/game/exportScence'
   import SubmitButton from '~/components/game/submitButton'
   import Panel from '~/components/game/panel'
-  import ResultModel from '~/components/game/resultModel'
+  // import ResultModel from '~/components/game/resultModel'
   import ResetButton from '~/components/game/resetButton'
   import AnswerPanel from '~/components/game/AnswerPanel'
   import debounce from 'lodash.debounce'
@@ -66,7 +94,11 @@
         selectedQuestionsId: null,
         panelStyle: {},
         fontStyle: {},
+        modleStyle: {},
         answerCanvas: null,
+        visibleModel: false,
+        errorAnswerLeft: [],
+        exportScence: null
       }
     },
     async mounted () {
@@ -97,31 +129,30 @@
 
       const { bg, titleBg } = this.assets
 
+
       // 准备场景
-      const exportScence = new ExportScence({
+      this.exportScence = new ExportScence({
         x: 0,
         y: 0,
         questions: this.questions,
         images: { bg, titleBg },
         title: this.questions.title,
-        ticker: this.gameMain.ticker
+        ticker: this.gameMain.ticker,
       })
 
       // 插入背景
-      // this.stage.addChild(exportScence)
-      this.answerCanvas = this.createAnswer()
-      // this.questionsSubmitCanvas = this.createSubmitButton()
-      this.questionsPanelCanvas = this.createPanel()
+      this.stage.addChild(this.exportScence)
 
+      this.questionsPanelCanvas = this.createPanel()
+      this.answerCanvas = this.createAnswer()
+      this.questionsSubmitCanvas = this.createSubmitButton()
       this.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
         this.setAnswer = this.questionsPanelCanvas.setAnswer
-        // console.log(this.setAnswer)
-        this.answerCanvas.text = `${this.setAnswer.length} / ${this.questions.left.length}`
-
-        // console.log(this.questionsPanelCanvas.setAnswer)
       })
+
       this.calculationPanel()
       this.initWindowOnSize()
+
     },
     methods: {
       createAnswer () {
@@ -129,7 +160,9 @@
           x: 150,
           y: 150,
           text: `${this.setAnswer.length} / ${this.questions.left.length}`,
-          image: this.assets.answerPanelBg
+          questionsLength: this.questions.left.length,
+          image: this.assets.answerPanelBg,
+          questionsPanelCanvas: this.questionsPanelCanvas
         })
         this.stage.addChild(answerPanel)
         return answerPanel
@@ -147,9 +180,6 @@
         })
 
         this.stage.addChild(panel)
-        // if (type === 'panel') {
-        //   this.questionsSubmitCanvas.visible = this.questionsPanelCanvas.setAnswer.every(item => item)
-        // }
 
         return panel
       },
@@ -165,42 +195,32 @@
         })
 
         subBtn.on(Hilo.event.POINTER_START, (e) => {
-          // this.setAnswer = this.questionsPanelCanvas.setAnswer
-          // this.questionsSubmitCanvas.visible = this.setAnswer.every(item => item)
+          this.setAnswer = this.questionsPanelCanvas.setAnswer
+          this.isAllRight = (this.setAnswer.length === this.questions.left.length)
+          if (!this.isAllRight) {
+            this.errorAnswerLeft = this.questions.left.filter(item => !this.setAnswer.includes(item.id))
+            this.errorAnswerRight = this.questions.right.filter(item => !this.setAnswer.includes(item.id))
+          }
+          this.visibleModel = true
 
-          // this.isAllRight = !this.setAnswer.filter((item, index) => (item && item.questionId) !== this.questions.right[index].id).length
+          this.exportScence.timeStart = false
 
-          // if (this.isAllRight) {
-          this.createModel(subBtn)
-          // }
+          this.exportScence.timeCount = 0
+
+          setTimeout(() => {
+            this.questionsResetCanvas = this.createRestButtons()
+            this.questionsSubmitCanvas.visible = false
+            this.visibleModel = false
+            // 移除显示结果panel
+            // this.stage.removeChild(this.questionsPanelCanvas)
+            this.questionsPanelCanvas.visible = false
+            // this.questionsPanelCanvas = null
+          }, 2000)
 
         })
         this.stage.addChild(subBtn)
 
         return subBtn
-      },
-      createModel (subBtn) {
-        const resultModel = new ResultModel({
-          x: 0,
-          y: 0,
-          images: { rightModel: this.assets.rightModel, errorModel: this.assets.errorModel },
-          width: 1920,
-          height: 1080,
-          rect: [0, 0, 1920, 1080],
-          isAllRight: this.isAllRight,
-          visible: true,
-          alpha: this.setAlpha
-        })
-
-        // 插入结果 model
-        this.stage.addChild(resultModel)
-
-        setTimeout(() => {
-          this.questionsResetCanvas = this.createRestButtons()
-          this.questionsSubmitCanvas.visible = false
-          this.stage.removeChild(resultModel)
-        }, 2000)
-        return resultModel
       },
       createRestButtons () {
         // 重置按钮
@@ -216,27 +236,33 @@
         })
 
         resetButtons.on(Hilo.event.POINTER_START, (e) => {
-
-          if (this.isAllRight) return this.resetHandel()
-
+          this.resetHandel()
         })
         this.stage.addChild(resetButtons)
 
         return resetButtons
       },
       resetHandel () {
-        // 移除显示结果panel
-        this.stage.removeChild(this.questionsPanelCanvas)
-
         this.questionsResetCanvas.visible = false
-
+        this.stage.removeChild(this.answerCanvas)
+        this.questionsSubmitCanvas.visible = true
         // 重置基础信息
         this.setAnswer = []
+        this.errorAnswerLeft = []
+        this.errorAnswerRight = []
 
-        this.shuffle(this.questions.left.concat(this.questions.useless))
-
+        this.shuffle(this.questions.left.concat(this.questions.right))
         // 重置后创建
-        this.questionsPanelCanvas = this.createPanel('panel')
+        this.questionsPanelCanvas = this.createPanel()
+        this.answerCanvas = this.createAnswer()
+
+        this.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
+          this.setAnswer = this.questionsPanelCanvas.setAnswer
+        })
+        this.exportScence.timeCount = 0
+
+        this.exportScence.timeStart = true
+
       },
       shuffle (arr) {
         for (var i = arr.length - 1; i >= 0; i--) {
@@ -264,11 +290,15 @@
         }
 
         const scaleBase = Math.round(oCanvas.getBoundingClientRect().width) / 1920
-        console.log(scaleBase)
 
         this.fontStyle = {
-          fontSize: '30px',
+          fontSize: '25px',
           transform: `translate(-50%, -50%) scale(${scaleBase})`
+        }
+
+        this.modleStyle = {
+          width: oCanvas.getBoundingClientRect().width + 'px',
+          height: oCanvas.getBoundingClientRect().height + 'px'
         }
       },
       getItem (type, id) {
@@ -315,6 +345,13 @@
     background-size: 50%;
   }
 
+  .answer-item__icon-error {
+    width: 12%;
+    height: 20%;
+    background: url("../static/panel__error__icon.png") no-repeat center center;
+    background-size: 50%;
+  }
+
   .answer-item__image {
     width: 30%;
     height: 85%;
@@ -353,5 +390,21 @@
     height: 98%;
     position: relative;
     left: 2%;
+  }
+
+  .answer-model__error {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: url("../static/answer__error.png") no-repeat center center;
+    background-size: 100% 100%;
+  }
+
+  .answer-model__right {
+    position: absolute;
+    left: 0;
+    top: 0;
+    background: url("../static/answer.png") no-repeat center center;
+    background-size: 100% 100%;
   }
 </style>

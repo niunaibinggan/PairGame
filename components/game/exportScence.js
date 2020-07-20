@@ -48,7 +48,6 @@ export default class ExportScence extends Hilo.Container {
   }
 
   initTime (properties) {
-
     const time = new Text({
       text: this.getTime(this.timeCount),
       fontSize: 55,
@@ -69,6 +68,11 @@ export default class ExportScence extends Hilo.Container {
         time.text = this.getTime(this.timeCount)
       }
     }, 1000)
+
+    // properties.submit.on(Hilo.event.POINTER_START, (e) => {
+    //   this.timeStart = false
+    //   // textContainer.text = `${setAnswer.length} / ${properties.questionsLength}`
+    // })
   }
 
   getTime (time = 0) {
