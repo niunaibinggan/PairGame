@@ -1,266 +1,251 @@
 import Hilo from 'hilojs'
 import Text from './text'
+import { forEach } from 'lodash'
 export default class ResultPanel extends Hilo.Container {
   constructor(properties) {
     super(properties)
 
-    this.leftQuestions = properties.questions.concat
-
-    this.rightQuestions = properties.questions.right
-
-    this.leftContainerY = 360 - this.leftQuestions.length * 20
-
-    this.rightContainerY = 360 - this.rightQuestions.length * 20
-
-    this.setAnswer = [...Array(this.rightQuestions.length)]
-
-    // this.stage = properties.stage
-
-    this.creatContainer()
-
-    this.submitButton(properties)
 
     this.initPanel(properties)
   }
 
-  leftQuestions = []
-  rightQuestions = []
+  setAnswer = []
 
-  leftContainer = null
-  rightContainer = null
-
-  answerContainer = null
-  rectRight = [0, 0, 471, 87]
-  rectLeft = [0, 0, 356, 86]
-  leftContainerY = 0
-  rightContainerY = 0
-  alpha = 1
-  timer = null
-
-  targetPosition = []
-  selectPosition = []
+  blockRect = [0, 0, 150, 150]
+  blockSelected = [0, 0, 163, 162]
+  blockSelectedError = [0, 0, 170, 172]
+  blockSelectedRight = [0, 0, 178, 176]
 
   setAnswer = []
 
-  submitButton (properties) {
-    properties.subBtn.on(Hilo.event.POINTER_START, (e) => {
-      const that = this
-      this.setAnswer.forEach((item, index) => {
-        if (item.questionId !== this.rightQuestions[index].id) {
-          Hilo.Tween.to(
-            that.leftContainer.getChildAt(item.realId),
-            { x: that.selectPosition[item.realId].x, y: that.selectPosition[item.realId].y },
-            { duration: 300 }
-          )
+  currentSelected = [...new Array(2)]
 
-          this.setAnswer[index] = undefined
-        }
-      })
-    })
-  }
+  rightContainer = null
 
-  creatContainer () {
-    this.rightContainer = new Hilo.Container({
-      x: 900,
-      y: this.rightContainerY,
-    }).addTo(this)
-
-    this.answerContainer = new Hilo.Container({
-      x: 0,
-      y: 0,
-    }).addTo(this.rightContainer)
-
-    this.leftContainer = new Hilo.Container({
-      x: 250,
-      y: this.leftContainerY,
-    }).addTo(this)
-  }
+  target = 6
 
   initPanel (properties) {
-    this.commonPanel({
-      type: 'left',
-      target: this.leftQuestions,
-      targetContainer: this.leftContainer,
-      rect: this.rectLeft,
-      images: { leftBg: properties.leftBg }
-    })
-    this.commonPanel({
-      type: 'right',
-      target: this.rightQuestions,
-      targetContainer: this.rightContainer,
-      rect: this.rectRight,
-      images: { leftBg: properties.leftBg, rightBg: properties.rightBg }
-    })
+    const columns = Math.ceil(properties.questions.length / this.target)
+    const rows = properties.questions.length % this.target
 
-    // 获取选项的初始位置
-    this.selectPosition = this.leftContainer.children.map(item => {
-      return { x: item.x, y: item.y }
-    })
+    const distance = 30
 
-    // 启动定时器
-    this.timer = setInterval(() => {
-      this.answerContainer.children.forEach(item => {
-        Hilo.Tween.to(
-          item,
-          { alpha: 0.3 },
-          {
-            duration: 500,
-            onComplete () {
-              item.alpha = .3
-              Hilo.Tween.to(
-                item,
-                { alpha: 0 },
-                { duration: 800, }
-              )
-            }
-          }
-        )
-      })
-    }, 1300)
-  }
+    const panel = new Hilo.Container({
+      x: 700,
+      y: 190,
+      width: 1050,
+      height: 700,
+    }).addTo(this)
 
-  commonPanel (data) {
-    const { type, target, targetContainer, rect, images } = data
-    target.forEach((item, index) => {
-      const questionsItem = new Hilo.Container({
-        id: { realId: index, questionId: item.id },
-        x: 0,
-        y: 0 + index * (170 - target.length * 10)
-      }).addTo(targetContainer)
+    const panelContainer = new Hilo.Container({
+      x: 0,
+      y: (700 - (columns * this.blockRect[2] + (columns - 1) * distance)) / 2,
+    }).addTo(panel)
+
+    properties.questions.forEach((item, index) => {
+
+      const id = { realId: index, questionId: item.id }
+
+      const { bgBlock } = properties.images
+
+      // 模块上下居中
+      let x
+      const y = Math.floor(index / this.target) * (this.blockRect[3] + distance)
+
+      if (!rows) {
+        x = (index % this.target) * (this.blockRect[2] + distance)
+      } else {
+        if (Math.ceil((index + 1) / this.target) !== columns) {
+          x = (index % this.target) * (this.blockRect[2] + distance)
+        } else {
+          x = ((1050 - (rows * this.blockRect[2] + (rows - 1) * distance)) / 2) + (index % this.target) * (this.blockRect[2] + distance)
+        }
+      }
+
+      const blockContainer = new Hilo.Container({
+        id,
+        x,
+        y,
+        visible: true,
+        alpha: 1
+      }).addTo(panelContainer)
 
       new Hilo.Bitmap({
-        x: type === 'left' ? 0 : this.rectLeft[2] - 12,
+        id,
+        image: bgBlock,
+        rect: this.blockRect,
+        visible: true,
+        scaleX: 1,
+        scaleY: 1,
+        x: 0,
         y: 0,
-        rect: rect,
-        image: type == 'left' ? images.leftBg : images.rightBg,
-        alpha: this.alpha
-      }).addTo(questionsItem)
+      }).addTo(blockContainer)
 
-      if (type === 'right') {
-        new Hilo.Bitmap({
-          id: { realId: index, questionId: item.id },
+      if (item.type === 'text') {
+        new Text({
+          id,
+          text: item.text,
+          fontSize: 40,
+          bold: true,
+          textAlign: 'center',
+          height: 110,
+          visible: true,
+          alpha: 1,
+          reTextWidth: this.blockRect[2],
           x: 0,
-          y: 1 + index * (170 - target.length * 10),
-          rect: this.rectLeft,
-          image: images.leftBg,
-          alpha: 0,
-        }).addTo(this.answerContainer)
+          y: 55,
+          color: '#975f21',
+        }).addTo(blockContainer)
       }
 
-      new Text({
-        id: { realId: index, questionId: item.id },
-        text: item.text,
-        fontSize: 50,
-        bold: true,
-        textAlign: 'center',
-        visible: true,
-        alpha: 1,
-        reTextWidth: type === 'left' ? rect[2] - 20 : rect[2] - 80,
-        height: rect[3] - 10,
-        x: type === 'left' ? 0 : this.rectLeft[2] - 12,
-        y: 10,
-        color: '#fff',
-      }).addTo(questionsItem)
+      if (item.type === 'image') {
+        // 渲染图片
+        const img = new Image()
+        img.src = item.text
+        img.onload = (e) => {
+          const realImageWidth = e.path[0].width
+          const realImageHeight = e.path[0].height
+          const scale = realImageWidth > realImageHeight ? this.blockRect[2] / realImageWidth : this.blockRect[3] / realImageHeight
+          new Hilo.Bitmap({
+            id,
+            x: realImageWidth > realImageHeight ? 0 : (this.blockRect[2] - realImageWidth * scale) / 2,
+            y: realImageWidth > realImageHeight ? (this.blockRect[3] - realImageHeight * scale) / 2 : 0,
+            width: realImageWidth * scale,
+            height: realImageHeight * scale,
+            image: item.text,
+            visible: true,
+          }).addTo(blockContainer)
+        }
+      }
 
-      if (type === 'left') this.drag(questionsItem)
+      blockContainer.on(Hilo.event.POINTER_START, (e) => {
+        if (this.currentSelected.every(item => item)) return
+        // 选中框
+        this.createSelectedBlock({ realId: index, questionId: item.id }, e, blockContainer, properties)
+      })
     })
   }
 
-  drag (target) {
-    Hilo.util.copy(target, Hilo.drag)
+  createSelectedBlock (id, e, target, properties) {
+    const { selectedBlock, selectedBlockError, selectedBlockRight, selectedBlockErrorLine } = properties.images
 
-    target.startDrag([-120, -this.leftContainerY, 1920, 1080])
+    const block = new Hilo.Bitmap({
+      id,
+      image: selectedBlock,
+      rect: this.blockSelected,
+      visible: true,
+      scaleX: 0.8,
+      scaleY: 0.8,
+      x: (this.blockRect[2] - this.blockSelected[2] * 0.8) / 2,
+      y: (this.blockRect[3] - this.blockSelected[3] * 0.8) / 2,
+      alpha: 0,
+    }).addTo(target)
 
-    target.on('dragStart', (e) => {
-      clearInterval(this.timer)
-      this.timer = null
-    })
+    Hilo.Tween.to(
+      block,
+      {
+        alpha: this.currentSelected[0] && this.currentSelected[0].realId === id.realId ? 0 : 1,
+        scaleX: 1,
+        scaleY: 1,
+        x: (this.blockRect[2] - this.blockSelected[2]) / 2,
+        y: (this.blockRect[3] - this.blockSelected[3]) / 2
+      },
+      { duration: 150 }
+    )
 
-    target.on('dragMove', (e) => {
+    const rightBlock = new Hilo.Bitmap({
+      id: 'rightBlock',
+      image: selectedBlockRight,
+      rect: this.blockSelectedRight,
+      visible: true,
+      scaleX: 0.5,
+      scaleY: 0.5,
+      x: (this.blockRect[2] - this.blockSelectedRight[2] * 0.5) / 2,
+      y: (this.blockRect[3] - this.blockSelectedRight[3] * 0.5) / 2,
+      alpha: 0,
+    }).addTo(target)
 
-      const includeArr = this.findItemIndex(e.target.x, e.target.y, 'arr')
+    const errorBlock = new Hilo.Bitmap({
+      id,
+      image: selectedBlockError,
+      rect: this.blockSelectedError,
+      visible: true,
+      scaleX: 0.8,
+      scaleY: 0.8,
+      x: (this.blockRect[2] - this.blockSelectedError[2] * 0.8) / 2,
+      y: (this.blockRect[3] - this.blockSelectedError[3] * 0.8) / 2,
+      alpha: 0,
+    }).addTo(target)
 
-      if (includeArr.length) {
-        this.answerContainer.children.forEach(item => {
-          item.alpha = includeArr.includes(item.id.realId) ? 0.3 : 0
-        })
-      } else {
-        this.answerContainer.children.map(item => item.alpha = 0)
-      }
-    })
 
-    target.on('dragEnd', (e) => {
-
-      this.answerContainer.children.map(item => item.alpha = 0)
-
-      const targetIndex = e.target.id.realId
-
-      const existIndex = this.setAnswer.findIndex(item => item && item.realId === targetIndex)
-
-      const currentTarget = this.findItemIndex(e.target.x, e.target.y)
-
-      const isSelected = currentTarget !== -1
-
-      const x = isSelected ? this.targetPosition[currentTarget].x : this.selectPosition[targetIndex].x
-
-      const y = isSelected ? this.targetPosition[currentTarget].y : this.selectPosition[targetIndex].y
-
-      if (isSelected && this.setAnswer[currentTarget]) {
-
-        const preIndex = this.setAnswer[currentTarget].realId
-
-        Hilo.Tween.to(
-          this.leftContainer.getChildAt(preIndex),
-          { x: this.selectPosition[preIndex].x, y: this.selectPosition[preIndex].y },
-          { duration: 200 }
-        )
-      }
-
-      if (existIndex !== -1) this.setAnswer[existIndex] = undefined
-
-      const that = this
-      Hilo.Tween.to(
-        target,
-        { x, y },
+    if (!this.currentSelected[0]) {
+      this.currentSelected[0] = Object.assign(e.eventTarget.id,
         {
-          duration: 300,
-          onComplete () {
-            if (isSelected) {
-              that.setAnswer[currentTarget] = e.target.id
-            }
-          }
+          errorCon: e.eventTarget.parent.getChildAt(4),
+          rightCon: e.eventTarget.parent.getChildAt(3),
+          parent: e.eventTarget.parent,
+          currentCon: e.eventTarget.parent.getChildAt(2)
         }
       )
-    })
-  }
-
-  findItemIndex (dragX, dragY, type) {
-
-    const distanceContainerX = 650
-
-    const distanceContainerY = Math.abs(this.leftContainerY - this.rightContainerY)
-
-    this.targetPosition = this.answerContainer.children.map(item => {
-      return { x: item.x + distanceContainerX, y: item.y + distanceContainerY }
-    })
-
-    const filterArr = this.targetPosition.filter((item, index) => {
-      if ((item.x + this.rectLeft[2] > dragX) && (item.x - this.rectLeft[2] < dragX)
-        && (item.y + this.rectLeft[3] > dragY) && (item.y - this.rectLeft[3] < dragY)) {
-        item.index = index
-        item.distanceY = Math.round(Math.abs(item.y - dragY))
-        return item
-      }
-    })
-
-    if (!filterArr.length) return type === 'arr' ? [] : -1
-
-    if (type === 'arr') {
-      return filterArr.map(item => item.index)
+    } else if (this.currentSelected[0] && (e.eventTarget.id.realId !== this.currentSelected[0].realId)) {
+      this.currentSelected[1] = Object.assign(e.eventTarget.id,
+        {
+          errorCon: e.eventTarget.parent.getChildAt(4),
+          rightCon: e.eventTarget.parent.getChildAt(3),
+          parent: e.eventTarget.parent,
+          currentCon: e.eventTarget.parent.getChildAt(2)
+        })
     }
 
-    const minDistance = Math.min(...filterArr.map(item => item.distanceY))
+    const that = this
+    if (this.currentSelected.every(item => item)) {
 
-    return filterArr[filterArr.findIndex(item => item.distanceY === minDistance)].index
+      if (this.currentSelected[0].questionId === this.currentSelected[1].questionId) {
+        this.currentSelected.forEach(item => {
+          Hilo.Tween.to(
+            item.rightCon,
+            {
+              alpha: 1, scaleX: 1.2, scaleY: 1.2,
+              x: (this.blockRect[2] - this.blockSelectedRight[2] * 1.2) / 2,
+              y: (this.blockRect[3] - this.blockSelectedRight[3] * 1.2) / 2
+            },
+            {
+              delay: 150,
+              duration: 150,
+              onComplete () {
+                Hilo.Tween.to(
+                  item.parent,
+                  { alpha: 0 },
+                  {
+                    duration: 150,
+                    onComplete () { that.currentSelected = that.currentSelected.map(item => item = undefined) }
+                  }
+                )
+              }
+            }
+          )
+        })
+
+      } else {
+        console.log(this.currentSelected[1].currentCon)
+        // that.currentSelected[1].currentCon.alpha = 0
+        Hilo.Tween.to(
+          that.currentSelected[0].errorCon,
+          {
+            alpha: .7, scaleX: 1, scaleY: 1,
+            x: (this.blockRect[2] - this.blockSelectedRight[2]) / 2,
+            y: (this.blockRect[3] - this.blockSelectedRight[3]) / 2
+          },
+          {
+            delay: 150,
+            duration: 150,
+            onComplete () {
+              block.alpha = 0
+              that.currentSelected[1] = undefined
+            }
+          }
+        )
+      }
+    }
   }
 }

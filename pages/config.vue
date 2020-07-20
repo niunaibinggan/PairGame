@@ -146,7 +146,7 @@
       },
       blurInput (type, index, content) {
         this.questions[type][index].isFocus = false
-        this.questions[type][index].content = content ? 'text' : ''
+        this.questions[type][index].type = content ? 'text' : ''
       },
       addQuestion () {
         if (this.questions.left.length >= this.target) {

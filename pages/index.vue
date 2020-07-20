@@ -29,7 +29,6 @@
         resultCanvas: null,
         setAlpha: 1,
         setAnswer: [],
-        timer: null
       }
     },
     async mounted () {
@@ -71,34 +70,27 @@
       })
 
       // 插入背景
-      this.stage.addChild(exportScence)
-      //   this.questionsSubmitCanvas = this.createSubmitButton()
-      //   this.questionsPanelCanvas = this.createPanel('panel')
+      // this.stage.addChild(exportScence)
+      // this.questionsSubmitCanvas = this.createSubmitButton()
+      this.questionsPanelCanvas = this.createPanel()
     },
     methods: {
-      createPanel (type = 'panel') {
-        const { leftBg, rightBg } = this.assets
+      createPanel () {
+        const { selectedBlock, selectedBlockError, selectedBlockRight, bgBlock, selectedBlockErrorLine } = this.assets
         // 插入题目 两个板块之间的距离 300 每个背景板的长度 499 106
         const panel = new Panel({
-          id: 'panel',
           x: 0,
           y: 0,
-          leftBg,
-          rightBg,
-          questions: this.questions,
+          questions: this.questions.concat,
           alpha: this.setAlpha,
-          type,
           stage: this.stage,
-          setAnswer: this.setAnswer,
-          subBtn: this.questionsSubmitCanvas
+          images: { selectedBlock, selectedBlockError, selectedBlockRight, bgBlock, selectedBlockErrorLine }
         })
 
         this.stage.addChild(panel)
-        if (type === 'panel') {
-          this.timer = setInterval(() => {
-            this.questionsSubmitCanvas.visible = this.questionsPanelCanvas.setAnswer.every(item => item)
-          }, 300)
-        }
+        // if (type === 'panel') {
+        //   this.questionsSubmitCanvas.visible = this.questionsPanelCanvas.setAnswer.every(item => item)
+        // }
 
         return panel
       },
@@ -109,28 +101,20 @@
           y: (1080 - 96) / 2 + 430,
           images: this.assets.submitButton,
           rect: [0, 0, 329, 96],
-          visible: false,
+          visible: true,
           alpha: this.setAlpha,
         })
 
         subBtn.on(Hilo.event.POINTER_START, (e) => {
-          clearInterval(this.timer)
+          // this.setAnswer = this.questionsPanelCanvas.setAnswer
+          // this.questionsSubmitCanvas.visible = this.setAnswer.every(item => item)
 
-          setTimeout(() => {
-            this.setAnswer = this.questionsPanelCanvas.setAnswer
+          // this.isAllRight = !this.setAnswer.filter((item, index) => (item && item.questionId) !== this.questions.right[index].id).length
 
-            this.timer = setInterval(() => {
-              this.questionsSubmitCanvas.visible = this.setAnswer.every(item => item)
-            }, 300)
+          // if (this.isAllRight) {
+          this.createModel(subBtn)
+          // }
 
-            this.isAllRight = !this.setAnswer.filter((item, index) => (item && item.questionId) !== this.questions.right[index].id).length
-
-            if (this.isAllRight) {
-              clearInterval(this.timer)
-              this.createModel(subBtn)
-            }
-
-          }, 300)
         })
         this.stage.addChild(subBtn)
 
@@ -140,10 +124,11 @@
         const resultModel = new ResultModel({
           x: 0,
           y: 0,
-          images: { rightModel: this.assets.rightModel },
+          images: { rightModel: this.assets.rightModel, errorModel: this.assets.errorModel },
           width: 1920,
           height: 1080,
           rect: [0, 0, 1920, 1080],
+          isAllRight: this.isAllRight,
           visible: true,
           alpha: this.setAlpha
         })

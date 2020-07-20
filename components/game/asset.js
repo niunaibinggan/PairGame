@@ -10,22 +10,28 @@ export default function () {
     submitButton: null,
     errorModel: null,
     rightModel: null,
-    rightBtn: null,
     resetBtn: null,
-    leftBg: null,
-    rightBg: null,
+    selectedBlock: null,
+    selectedBlockError: null,
+    selectedBlockRight: null,
+    bgBlock: null,
+    selectedBlockErrorLine: null,
 
     async load () {
       const resources = [
         { id: 'bg', src: require('~/static/bg.png') },
         { id: 'titleBg', src: require('~/static/title.png') },
         { id: 'submit', src: require('~/static/submit.png') },
-        { id: 'errorModel', src: require('~/static/answer.png') },
+        { id: 'errorModel', src: require('~/static/answer__error.png') },
         { id: 'rightModel', src: require('~/static/answer.png') },
-        // { id: 'rightBtn', src: require('~/static/answer_button.png') },
         { id: 'resetBtn', src: require('~/static/again_button.png') },
-        { id: 'leftBg', src: require('~/static/left_bg.png') },
-        { id: 'rightBg', src: require('~/static/right_bg.png') },
+
+        { id: 'selectedBlock', src: require('~/static/selected.png') },
+        { id: 'selectedBlockError', src: require('~/static/error__bg.png') },
+        { id: 'selectedBlockErrorLine', src: require('~/static/error__line.png') },
+        { id: 'selectedBlockRight', src: require('~/static/right__bg.png') },
+        { id: 'bgBlock', src: require('~/static/block.jpg') },
+
       ]
       this.queue = new Hilo.LoadQueue()
       this.queue.add(resources)
@@ -54,10 +60,13 @@ export default function () {
       this.submitButton = this.queue.get('submit').content
       this.rightModel = this.queue.get('rightModel').content
       this.errorModel = this.queue.get("errorModel").content
-      // this.rightBtn = this.queue.get("rightBtn").content
       this.resetBtn = this.queue.get("resetBtn").content
-      this.leftBg = this.queue.get('leftBg').content
-      this.rightBg = this.queue.get("rightBg").content
+
+      this.selectedBlock = this.queue.get("selectedBlock").content
+      this.selectedBlockError = this.queue.get("selectedBlockError").content
+      this.selectedBlockRight = this.queue.get("selectedBlockRight").content
+      this.bgBlock = this.queue.get("bgBlock").content
+      this.selectedBlockErrorLine = this.queue.get("selectedBlockErrorLine").content
 
       this.queue.off('complete')
       this.fire('complete')
