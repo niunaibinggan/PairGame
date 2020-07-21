@@ -26,7 +26,7 @@
                  placeholder="请输入内容"
                  class="root__item-input"
                  v-model="item.text"
-                 @focus="focusInput('left',index,item.text)"
+                 @focus.stop="focusInput('left',index,item.text)"
                  @blur="blurInput('left',index, item.text)">
 
           <span class="root__item-upload"
@@ -121,6 +121,7 @@
     },
     methods: {
       selectItem (type, index) {
+        console.log(1)
         this.current = index
         this.selectedType = type
       },
@@ -141,12 +142,20 @@
         this.selectedType = ''
       },
       focusInput (type, index, content) {
-        this.questions[type][index].isFocus = true
-        this.questions[type][index].type = 'text'
+        setTimeout(() => {
+          console.log(2)
+          this.questions[type][index].isFocus = true
+          this.questions[type][index].type = 'text'
+        }, 200)
       },
       blurInput (type, index, content) {
         this.questions[type][index].isFocus = false
         this.questions[type][index].type = content ? 'text' : ''
+
+        setTimeout(() => {
+          this.questions[type][index].type = content ? 'text' : ''
+          console.log(this.questions[type][index].type)
+        }, 250)
       },
       addQuestion () {
         if (this.questions.left.length >= this.target) {
@@ -261,8 +270,8 @@
     min-width: 400px;
     margin: 0 auto;
     padding: 10px;
-    height: 480px;
-    overflow: scroll;
+    max-height: 480px;
+    overflow-y: auto;
   }
 
   .root__item {
@@ -325,7 +334,8 @@
     text-align: center;
     margin-top: 38px;
     border: none;
-    font-size: 14px;
+    font-size: 16px;
+    color: #5f6c65;
   }
   .root__delete {
     display: none;

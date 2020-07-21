@@ -36,7 +36,7 @@
         const tag = TAG_DIC[fileType]
         if (!tag) {
           this.$message({
-            message: `只支持图片/视频/音频哦`,
+            message: `只支持图片哦`,
             type: 'warning'
           })
           return false
