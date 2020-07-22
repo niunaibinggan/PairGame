@@ -6,7 +6,7 @@
     <div class="answer-panel"
          :style="panelStyle">
       <ul class="ansewer-list"
-          v-if="setAnswer.length">
+          v-if="visibleAnswer">
         <li class="answer-item"
             v-for="(item,index) in errorAnswerLeft"
             :key="item.id">
@@ -57,6 +57,34 @@
         </li>
 
       </ul>
+
+      <ul class="ansewer-list"
+          v-if="!isSearch">
+        <li class="answer-item"
+            v-for="(item,index) in questions.left"
+            :key="item.id">
+          <span class="answer-item__icon-right"></span>
+          <span class="answer-item__image">
+            <span class="answer-item__image-text"
+                  v-if="item.type === 'text'"
+                  :style="item.fontStyle">{{item.text}}</span>
+            <el-image v-if="item.type=== 'image'"
+                      class="answer-item__image-img"
+                      :src="item.text"
+                      fit="contain"></el-image>
+          </span>
+          <span class="answer-item__line"></span>
+          <span class="answer-item__image">
+            <span class="answer-item__image-text"
+                  v-if="questions.right[index].type === 'text'"
+                  :style="questions.right[index].fontStyle">{{questions.right[index].text}}</span>
+            <el-image v-if="questions.right[index].type=== 'image'"
+                      class="answer-item__image-img"
+                      :src="questions.right[index].text"
+                      fit="contain"></el-image>
+          </span>
+        </li>
+      </ul>
     </div>
 
     <div v-if="visibleModel"
@@ -88,6 +116,7 @@
         questionsPanelCanvas: null,
         questionsResetCanvas: null,
         questionsSubmitCanvas: null,
+        buttonsCanvas: null,
         resultCanvas: null,
         setAlpha: 1,
         setAnswer: [],
@@ -97,7 +126,9 @@
         answerCanvas: null,
         visibleModel: false,
         errorAnswerLeft: [],
-        exportScence: null
+        exportScence: null,
+        isSearch: true,
+        visibleAnswer: true,
       }
     },
     async mounted () {
@@ -127,8 +158,6 @@
       const oCanvas = document.querySelector('canvas')
 
       const { bg, titleBg } = this.assets
-
-
       // 准备场景
       this.exportScence = new ExportScence({
         x: 0,
@@ -140,20 +169,78 @@
       })
 
       // 插入背景
-      // this.stage.addChild(this.exportScence)
-
+      this.stage.addChild(this.exportScence)
+      this.buttonsCanvas = this.createButtons()
       this.questionsPanelCanvas = this.createPanel()
       this.questionsSubmitCanvas = this.createSubmitButton()
       this.answerCanvas = this.createAnswer()
-      this.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
-        this.setAnswer = this.questionsPanelCanvas.setAnswer
-      })
 
       this.calculationPanel()
       this.initWindowOnSize()
 
     },
     methods: {
+      createButtons () {
+        const buttons = new Hilo.Container({
+          x: 300,
+          y: 980,
+          width: 160,
+          height: 50,
+          visible: true,
+          isSearch: this.isSearch
+        })
+
+        const buttonBg = new Hilo.View({
+          width: 160,
+          height: 50,
+          visible: true,
+        }).addTo(buttons)
+
+        this.onloadImage(
+          this.isSearch ? require('../static/answer__button.png') : require('../static/questions__button.png'),
+          buttonBg)
+
+        this.stage.addChild(buttons)
+        buttons.on(Hilo.event.POINTER_START, (e) => {
+          this.visibleAnswer = false
+          this.questionsPanelCanvas.visible = false
+
+          this.isSearch = !this.isSearch
+          this.onloadImage(
+            this.isSearch ? require('../static/answer__button.png') : require('../static/questions__button.png'),
+            buttonBg)
+
+          // 重置基础信息
+          this.setAnswer = []
+          this.errorAnswerLeft = []
+          this.errorAnswerRight = []
+
+          if (this.isSearch) {
+            this.questionsSubmitCanvas.visible = true
+            this.answerCanvas.getChildAt(1).text = `0 / ${this.questions.left.length}`
+            this.exportScence.timeCount = 0
+            this.exportScence.timeStart = true
+
+            // 重置后创建
+            this.stage.removeChild(this.questionsPanelCanvas)
+            this.questionsPanelCanvas = this.createPanel()
+          } else {
+            this.questionsSubmitCanvas.visible = false
+            this.answerCanvas.getChildAt(1).text = `${this.questions.left.length} / ${this.questions.left.length}`
+            this.exportScence.timeStart = false
+          }
+        })
+        return buttons
+      },
+      onloadImage (image, target) {
+        const img = new Image()
+        img.src = image
+        img.onload = () => {
+          img.onload = null
+          const pattern = this.stage.renderer.context.createPattern(img, 'no-repeat')
+          target.background = pattern
+        }
+      },
       createAnswer () {
         const answerPanel = new AnswerPanel({
           x: 150,
@@ -161,8 +248,6 @@
           text: `${this.setAnswer.length} / ${this.questions.left.length}`,
           questionsLength: this.questions.left.length,
           image: this.assets.answerPanelBg,
-          questionsPanelCanvas: this.questionsPanelCanvas,
-          questionsSubmitCanvas: this.questionsSubmitCanvas
         })
         this.stage.addChild(answerPanel)
         return answerPanel
@@ -180,6 +265,14 @@
         })
 
         this.stage.addChild(panel)
+
+        panel.on(Hilo.event.POINTER_START, (e) => {
+          this.visibleAnswer = true
+
+          this.setAnswer = this.questionsPanelCanvas.setAnswer
+
+          this.answerCanvas.getChildAt(1).text = `${this.setAnswer.length} / ${this.questions.left.length}`
+        })
 
         return panel
       },
@@ -206,6 +299,10 @@
           this.exportScence.timeStart = false
 
           this.exportScence.timeCount = 0
+
+          this.buttonsCanvas.visible = false
+
+          this.answerCanvas.getChildAt(1).text = `${this.questions.left.length} / ${this.questions.left.length}`
 
           setTimeout(() => {
             this.questionsResetCanvas = this.createRestButtons()
@@ -246,6 +343,7 @@
         this.questionsResetCanvas.visible = false
         this.stage.removeChild(this.answerCanvas)
         this.questionsSubmitCanvas.visible = true
+        this.buttonsCanvas.visible = true
         // 重置基础信息
         this.setAnswer = []
         this.errorAnswerLeft = []
@@ -256,9 +354,6 @@
         this.questionsPanelCanvas = this.createPanel()
         this.answerCanvas = this.createAnswer()
 
-        this.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
-          this.setAnswer = this.questionsPanelCanvas.setAnswer
-        })
         this.exportScence.timeCount = 0
 
         this.exportScence.timeStart = true

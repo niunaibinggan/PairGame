@@ -31,14 +31,5 @@ export default class AnswerPanel extends Hilo.Container {
       y: 30,
       color: '#ffffff',
     }).addTo(this)
-
-    properties.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
-      const setAnswer = properties.questionsPanelCanvas.setAnswer
-      textContainer.text = `${setAnswer.length} / ${properties.questionsLength}`
-    })
-
-    properties.questionsSubmitCanvas.on(Hilo.event.POINTER_START, (e) => {
-      textContainer.text = `${properties.questionsLength} / ${properties.questionsLength}`
-    })
   }
 }
