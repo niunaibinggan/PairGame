@@ -1,6 +1,5 @@
 import Hilo from 'hilojs'
 import Text from './text'
-import { forEach } from 'lodash'
 export default class ResultPanel extends Hilo.Container {
   constructor(properties) {
     super(properties)
@@ -84,11 +83,30 @@ export default class ResultPanel extends Hilo.Container {
         y: 0,
       }).addTo(blockContainer)
 
+      let fontSize = 38
+
+      let fontSizeY = 60
+
+      if (this.getByte(item.text) > 8 && this.getByte(item.text) < 22) {
+        fontSize = 38 - (this.getByte(item.text) / 5) * 5
+        fontSizeY = 65 - fontSize / 2
+      }
+
+      else if (this.getByte(item.text) >= 22 && this.getByte(item.text) < 35) {
+        fontSize = 38 - (this.getByte(item.text) / 13) * 5
+        fontSizeY = 35 - fontSize / 2
+      }
+      else if (this.getByte(item.text) >= 35) {
+        fontSize = 38 - (this.getByte(item.text) / 15) * 5
+        fontSizeY = 25 - fontSize / 2
+      }
+
       if (item.type === 'text') {
         new Text({
           id,
           text: item.text,
-          fontSize: 40,
+          lineHeight: this.getByte(item.text) < 8 ? 0 : fontSize + 9,
+          fontSize,
           bold: true,
           textAlign: 'center',
           height: 110,
@@ -96,7 +114,7 @@ export default class ResultPanel extends Hilo.Container {
           alpha: 1,
           reTextWidth: this.blockRect[2],
           x: 0,
-          y: 55,
+          y: fontSizeY,
           color: '#975f21',
         }).addTo(blockContainer)
       }
@@ -204,7 +222,7 @@ export default class ResultPanel extends Hilo.Container {
     if (this.currentSelected.every(item => item)) {
 
       if (this.currentSelected[0].questionId === this.currentSelected[1].questionId) {
-        this.setAnswer.push(this.currentSelected[0].questionId)
+        this.setAnswer.unshift(this.currentSelected[0].questionId)
         this.selectedQuestionsId = this.currentSelected[0].questionId
         this.currentSelected.forEach(item => {
           Hilo.Tween.to(
@@ -314,5 +332,16 @@ export default class ResultPanel extends Hilo.Container {
         )
       }
     }
+  }
+
+  getByte (str = '') {
+    let len = 0
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charAt(i);
+      if (escape(c).length > 4) {
+        len += 2;
+      } else if (c != "\r") { len++; }
+    }
+    return len
   }
 }

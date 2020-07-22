@@ -8,38 +8,13 @@
       <ul class="ansewer-list"
           v-if="setAnswer.length">
         <li class="answer-item"
-            v-for="item in setAnswer"
-            :key="item">
-          <span class="answer-item__icon-right"></span>
-          <span class="answer-item__image">
-            <span class="answer-item__image-text"
-                  v-if="getItem('left',item).type === 'text'"
-                  :style="fontStyle">{{getItem('left',item).text}}</span>
-            <el-image v-if="getItem('left',item).type=== 'image'"
-                      class="answer-item__image-img"
-                      :src="getItem('left',item).text"
-                      fit="contain"></el-image>
-          </span>
-          <span class="answer-item__line"></span>
-          <span class="answer-item__image">
-            <span class="answer-item__image-text"
-                  v-if="getItem('right',item).type === 'text'"
-                  :style="fontStyle">{{getItem('right',item).text}}</span>
-            <el-image v-if="getItem('right',item).type=== 'image'"
-                      class="answer-item__image-img"
-                      :src="getItem('right',item).text"
-                      fit="contain"></el-image>
-          </span>
-        </li>
-
-        <li class="answer-item"
             v-for="(item,index) in errorAnswerLeft"
             :key="item.id">
           <span class="answer-item__icon-error"></span>
           <span class="answer-item__image">
             <span class="answer-item__image-text"
                   v-if="item.type === 'text'"
-                  :style="fontStyle">{{item.text}}</span>
+                  :style="item.fontStyle">{{item.text}}</span>
             <el-image v-if="item.type=== 'image'"
                       class="answer-item__image-img"
                       :src="item.text"
@@ -49,13 +24,38 @@
           <span class="answer-item__image">
             <span class="answer-item__image-text"
                   v-if="errorAnswerRight[index].type === 'text'"
-                  :style="fontStyle">{{errorAnswerRight[index].text}}</span>
+                  :style="errorAnswerRight[index].fontStyle">{{errorAnswerRight[index].text}}</span>
             <el-image v-if="errorAnswerRight[index].type=== 'image'"
                       class="answer-item__image-img"
                       :src="errorAnswerRight[index].text"
                       fit="contain"></el-image>
           </span>
         </li>
+        <li class="answer-item"
+            v-for="item in setAnswer"
+            :key="item">
+          <span class="answer-item__icon-right"></span>
+          <span class="answer-item__image">
+            <span class="answer-item__image-text"
+                  v-if="getItem('left',item).type === 'text'"
+                  :style="getItem('left',item).fontStyle">{{getItem('left',item).text}}</span>
+            <el-image v-if="getItem('left',item).type=== 'image'"
+                      class="answer-item__image-img"
+                      :src="getItem('left',item).text"
+                      fit="contain"></el-image>
+          </span>
+          <span class="answer-item__line"></span>
+          <span class="answer-item__image">
+            <span class="answer-item__image-text"
+                  v-if="getItem('right',item).type === 'text'"
+                  :style="getItem('right',item).fontStyle">{{getItem('right',item).text}}</span>
+            <el-image v-if="getItem('right',item).type=== 'image'"
+                      class="answer-item__image-img"
+                      :src="getItem('right',item).text"
+                      fit="contain"></el-image>
+          </span>
+        </li>
+
       </ul>
     </div>
 
@@ -291,9 +291,27 @@
 
         const scaleBase = Math.round(oCanvas.getBoundingClientRect().width) / 1920
 
+        this.questions.left.forEach((item, index) => {
+          item.fontSize = {
+            fontSize: '18px',
+            // top: `${50 - Math.floor(this.getByte(item.text) / 10)}%`,
+            top: '20%',
+            transform: `translate(-50%, -50%) scale(${scaleBase})`,
+          }
+
+          this.questions.right[index].fontSize = {
+            fontSize: '18px',
+            top: `${50 - Math.floor(this.getByte(item.text) / 10)}%`,
+            transform: `translate(-50%, -50%) scale(${scaleBase})`,
+          }
+        })
+
+        console.log(this.questions)
+
         this.fontStyle = {
-          fontSize: '25px',
-          transform: `translate(-50%, -50%) scale(${scaleBase})`
+          fontSize: '18px',
+          transform: `translate(-50%, -50%) scale(${scaleBase})`,
+          // top: `${50 - Math.floor(this.getByte(item.text) / 10)}%`
         }
 
         this.modleStyle = {
@@ -304,6 +322,16 @@
       getItem (type, id) {
         const current = this.questions.left.findIndex(item => item.id === id)
         return this.questions[type][current]
+      },
+      getByte (str = '') {
+        let len = 0
+        for (var i = 0; i < str.length; i++) {
+          var c = str.charAt(i);
+          if (escape(c).length > 4) {
+            len += 2;
+          } else if (c != "\r") { len++; }
+        }
+        return len
       }
     }
   }
@@ -320,7 +348,7 @@
   .ansewer-list {
     width: 100%;
     height: 100%;
-    overflow: scroll;
+    overflow-y: auto;
     padding: 5%;
   }
   .answer-item {

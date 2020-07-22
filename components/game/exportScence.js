@@ -34,17 +34,28 @@ export default class ExportScence extends Hilo.Container {
     // 标题
     new Text({
       text: properties.title,
-      fontSize: 65,
+      fontSize: this.getByte(properties.title) < 30 ? 65 : 65 - Math.round(this.getByte(properties.title) / 12) * 5,
       bold: true,
       textAlign: 'center',
       height: 110,
       visible: true,
       alpha: 1,
-      reTextWidth: 1600,
-      x: (1920 - 1600) / 2,
-      y: 50,
+      reTextWidth: 1400,
+      x: (1920 - 1600) / 2 - 100,
+      y: this.getByte(properties.title) < 30 ? 50 : 50 + (65 - (65 - Math.round(this.getByte(properties.title) / 12) * 5)) / 2,
       color: '#ffffff',
     }).addTo(this)
+  }
+
+  getByte (str = '') {
+    let len = 0
+    for (var i = 0; i < str.length; i++) {
+      var c = str.charAt(i);
+      if (escape(c).length > 4) {
+        len += 2;
+      } else if (c != "\r") { len++; }
+    }
+    return len
   }
 
   initTime (properties) {

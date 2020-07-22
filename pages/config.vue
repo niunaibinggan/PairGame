@@ -56,8 +56,8 @@
                  placeholder="请输入内容"
                  class="root__item-input"
                  v-model="questions.right[index].text"
-                 @focus="focusInput('right',index,item.text)"
-                 @blur="blurInput('right',index, item.text)">
+                 @focus="focusInput('right',index,questions.right[index].text)"
+                 @blur="blurInput('right',index, questions.right[index].text)">
 
           <span class="root__item-upload"
                 v-if="!questions.right[index].isFocus && questions.right[index].type!== 'text'">
@@ -121,7 +121,6 @@
     },
     methods: {
       selectItem (type, index) {
-        console.log(1)
         this.current = index
         this.selectedType = type
       },
@@ -136,14 +135,11 @@
       },
       deleteContent (type, index) {
         this.questions[type][index].text = ''
-        setTimeout(() => {
-          this.questions[type][index].type = ''
-        }, 300);
+        this.questions[type][index].type = ''
         this.selectedType = ''
       },
       focusInput (type, index, content) {
         setTimeout(() => {
-          console.log(2)
           this.questions[type][index].isFocus = true
           this.questions[type][index].type = 'text'
         }, 200)
@@ -151,11 +147,6 @@
       blurInput (type, index, content) {
         this.questions[type][index].isFocus = false
         this.questions[type][index].type = content ? 'text' : ''
-
-        setTimeout(() => {
-          this.questions[type][index].type = content ? 'text' : ''
-          console.log(this.questions[type][index].type)
-        }, 250)
       },
       addQuestion () {
         if (this.questions.left.length >= this.target) {
@@ -193,6 +184,14 @@
         if (!this.questions.title) {
           this.$message({
             message: `请填写标题！`,
+            type: 'warning'
+          })
+          return
+        }
+
+        if (this.getByte(this.questions.title) > 50) {
+          this.$message({
+            message: `最多输入50个字符`,
             type: 'warning'
           })
           return
@@ -236,6 +235,16 @@
           ],
           title: '请将相对应的连接起来'
         }
+      },
+      getByte (str = '') {
+        let len = 0
+        for (var i = 0; i < str.length; i++) {
+          var c = str.charAt(i);
+          if (escape(c).length > 4) {
+            len += 2;
+          } else if (c != "\r") { len++; }
+        }
+        return len
       },
     }
   }

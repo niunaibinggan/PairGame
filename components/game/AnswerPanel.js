@@ -36,5 +36,9 @@ export default class AnswerPanel extends Hilo.Container {
       const setAnswer = properties.questionsPanelCanvas.setAnswer
       textContainer.text = `${setAnswer.length} / ${properties.questionsLength}`
     })
+
+    properties.questionsSubmitCanvas.on(Hilo.event.POINTER_START, (e) => {
+      textContainer.text = `${properties.questionsLength} / ${properties.questionsLength}`
+    })
   }
 }
