@@ -93,7 +93,6 @@
         setAnswer: [],
         selectedQuestionsId: null,
         panelStyle: {},
-        fontStyle: {},
         modleStyle: {},
         answerCanvas: null,
         visibleModel: false,
@@ -141,11 +140,11 @@
       })
 
       // 插入背景
-      this.stage.addChild(this.exportScence)
+      // this.stage.addChild(this.exportScence)
 
       this.questionsPanelCanvas = this.createPanel()
-      this.answerCanvas = this.createAnswer()
       this.questionsSubmitCanvas = this.createSubmitButton()
+      this.answerCanvas = this.createAnswer()
       this.questionsPanelCanvas.on(Hilo.event.POINTER_START, (e) => {
         this.setAnswer = this.questionsPanelCanvas.setAnswer
       })
@@ -162,7 +161,8 @@
           text: `${this.setAnswer.length} / ${this.questions.left.length}`,
           questionsLength: this.questions.left.length,
           image: this.assets.answerPanelBg,
-          questionsPanelCanvas: this.questionsPanelCanvas
+          questionsPanelCanvas: this.questionsPanelCanvas,
+          questionsSubmitCanvas: this.questionsSubmitCanvas
         })
         this.stage.addChild(answerPanel)
         return answerPanel
@@ -292,27 +292,17 @@
         const scaleBase = Math.round(oCanvas.getBoundingClientRect().width) / 1920
 
         this.questions.left.forEach((item, index) => {
-          item.fontSize = {
+          item.fontStyle = {
             fontSize: '18px',
-            // top: `${50 - Math.floor(this.getByte(item.text) / 10)}%`,
-            top: '20%',
+            top: this.getByte(item.text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(item.text) / 12)}%`,
             transform: `translate(-50%, -50%) scale(${scaleBase})`,
           }
-
-          this.questions.right[index].fontSize = {
+          this.questions.right[index].fontStyle = {
             fontSize: '18px',
-            top: `${50 - Math.floor(this.getByte(item.text) / 10)}%`,
+            top: this.getByte(item.text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(item.text) / 12)}%`,
             transform: `translate(-50%, -50%) scale(${scaleBase})`,
           }
         })
-
-        console.log(this.questions)
-
-        this.fontStyle = {
-          fontSize: '18px',
-          transform: `translate(-50%, -50%) scale(${scaleBase})`,
-          // top: `${50 - Math.floor(this.getByte(item.text) / 10)}%`
-        }
 
         this.modleStyle = {
           width: oCanvas.getBoundingClientRect().width + 'px',
@@ -404,7 +394,7 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 200%;
+    width: 130%;
     height: 50%;
     text-align: center;
     padding-left: 2%;

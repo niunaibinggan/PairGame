@@ -89,7 +89,7 @@ export default class ResultPanel extends Hilo.Container {
 
       if (this.getByte(item.text) > 8 && this.getByte(item.text) < 22) {
         fontSize = 38 - (this.getByte(item.text) / 5) * 5
-        fontSizeY = 65 - fontSize / 2
+        fontSizeY = 65 - fontSize / 2 + 10
       }
 
       else if (this.getByte(item.text) >= 22 && this.getByte(item.text) < 35) {
@@ -205,7 +205,8 @@ export default class ResultPanel extends Hilo.Container {
           errorCon: e.eventTarget.parent.getChildAt(4),
           rightCon: e.eventTarget.parent.getChildAt(3),
           parent: e.eventTarget.parent,
-          currentCon: e.eventTarget.parent.getChildAt(2)
+          currentCon: e.eventTarget.parent.getChildAt(2),
+          block,
         }
       )
     } else if (this.currentSelected[0] && (e.eventTarget.id.realId !== this.currentSelected[0].realId)) {
@@ -214,7 +215,8 @@ export default class ResultPanel extends Hilo.Container {
           errorCon: e.eventTarget.parent.getChildAt(4),
           rightCon: e.eventTarget.parent.getChildAt(3),
           parent: e.eventTarget.parent,
-          currentCon: e.eventTarget.parent.getChildAt(2)
+          currentCon: e.eventTarget.parent.getChildAt(2),
+          block
         })
     }
 
@@ -323,6 +325,7 @@ export default class ResultPanel extends Hilo.Container {
             delay: 150,
             duration: 150,
             onComplete () {
+              that.currentSelected[0].block.alpha = 0
               block.alpha = 0
               that.currentSelected[1] = undefined
               that.selectedQuestionsId = null
