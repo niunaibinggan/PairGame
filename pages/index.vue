@@ -311,6 +311,7 @@
             // 移除显示结果panel
             // this.stage.removeChild(this.questionsPanelCanvas)
             this.questionsPanelCanvas.visible = false
+            this.visibleAnswer = true
             // this.questionsPanelCanvas = null
           }, 2000)
 
@@ -376,6 +377,8 @@
       },
       calculationPanel () {
         const oCanvas = document.getElementsByTagName('canvas')[0]
+
+        if (!oCanvas) return
 
         this.panelStyle = {
           width: Math.round(oCanvas.getBoundingClientRect().width / 4.2) + 'px',

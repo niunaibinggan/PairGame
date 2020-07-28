@@ -327,6 +327,7 @@ export default class ResultPanel extends Hilo.Container {
             onComplete () {
               that.currentSelected[0].block.alpha = 0
               block.alpha = 0
+              that.currentSelected[0] = undefined
               that.currentSelected[1] = undefined
               that.selectedQuestionsId = null
               that.lineContainer.removeAllChildren()
