@@ -127,6 +127,7 @@
       } catch (error) {
         questions = localStorage.getItem('questionsConfig')
       }
+      if (!questions) return
       this.questions = JSON.parse(questions)
     },
     methods: {
@@ -203,6 +204,16 @@
         if (this.getByte(this.questions.title) > 25) {
           this.$message({
             message: `最多输入25个字符`,
+            type: 'warning'
+          })
+          return
+        }
+
+        const textFilter = this.questions.left.concat(this.questions.right).filter(item => (item.type === 'text' && this.getByte(item.text) > 16))
+
+        if (textFilter.length) {
+          this.$message({
+            message: `最多输入16个字符`,
             type: 'warning'
           })
           return
