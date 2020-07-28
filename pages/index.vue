@@ -389,16 +389,17 @@
 
         const scaleBase = Math.round(oCanvas.getBoundingClientRect().width) / 1920
 
+        console.log(scaleBase)
         this.questions.left.forEach((item, index) => {
           item.fontStyle = {
-            fontSize: '18px',
+            fontSize: `${18 * scaleBase}px`,
             top: this.getByte(item.text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(item.text) / 12)}%`,
-            transform: `translate(-50%, -50%) scale(${scaleBase})`,
+            transform: `translate(-47%, -50%) scaleY(${scaleBase})`,
           }
           this.questions.right[index].fontStyle = {
-            fontSize: '18px',
+            fontSize: `${18 * scaleBase}px`,
             top: this.getByte(item.text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(item.text) / 12)}%`,
-            transform: `translate(-50%, -50%) scale(${scaleBase})`,
+            transform: `translate(-47%, -50%) scaleY(${scaleBase})`,
           }
         })
 
@@ -492,12 +493,12 @@
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 130%;
-    height: 50%;
+    width: 92%;
     text-align: center;
     padding-left: 2%;
     font-weight: bold;
     color: #975f21;
+    word-break: break-word;
   }
 
   .answer-item__image-img {

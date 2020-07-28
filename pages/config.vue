@@ -116,8 +116,18 @@
         target: 12,
         current: -1,
         selectedType: '',
-        isFocus: false
+        isFocus: false,
+        isWaiting: false
       }
+    },
+    async mounted () {
+      let questions
+      try {
+        questions = await this.$testload()
+      } catch (error) {
+        questions = localStorage.getItem('questionsConfig')
+      }
+      this.questions = JSON.parse(questions)
     },
     methods: {
       selectItem (type, index) {
@@ -162,6 +172,7 @@
 
       },
       async submitConfig () {
+        if (this.isWaiting) { return false }
         const leftVerify = this.questions.left.every(item => item.text)
         if (!leftVerify) {
           this.$message({
@@ -189,9 +200,9 @@
           return
         }
 
-        if (this.getByte(this.questions.title) > 50) {
+        if (this.getByte(this.questions.title) > 25) {
           this.$message({
-            message: `最多输入50个字符`,
+            message: `最多输入25个字符`,
             type: 'warning'
           })
           return
@@ -213,11 +224,13 @@
 
         let setQuestion = this.questions
         try {
+          this.isWaiting = true
           const thumbnail = await save(setQuestion)
           await this.$testsave(thumbnail, JSON.stringify(setQuestion))
         } catch (error) {
           localStorage.setItem('questionsConfig', JSON.stringify(setQuestion))
         }
+        this.isWaiting = false
         this.$router.replace('/')
 
       },
