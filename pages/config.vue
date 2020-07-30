@@ -3,6 +3,7 @@
     <h3 class="root__title-set">
       <input type="text"
              v-model="questions.title"
+             maxlength="10"
              placeholder="请输入标题">
     </h3>
 
@@ -24,6 +25,7 @@
           <input v-if="item.type!== 'image'"
                  type="text"
                  placeholder="请输入内容"
+                 maxlength="8"
                  class="root__item-input"
                  v-model="item.text"
                  @focus.stop="focusInput('left',index,item.text)"
@@ -54,6 +56,7 @@
           <input v-if="questions.right[index].type!== 'image'"
                  type="text"
                  placeholder="请输入内容"
+                 maxlength="8"
                  class="root__item-input"
                  v-model="questions.right[index].text"
                  @focus="focusInput('right',index,questions.right[index].text)"
@@ -209,11 +212,11 @@
           return
         }
 
-        const textFilter = this.questions.left.concat(this.questions.right).filter(item => (item.type === 'text' && this.getByte(item.text) > 16))
+        const textFilter = this.questions.left.concat(this.questions.right).filter(item => (item.type === 'text' && this.getByte(item.text) > 15))
 
         if (textFilter.length) {
           this.$message({
-            message: `最多输入16个字符`,
+            message: `最多输入15个字符`,
             type: 'warning'
           })
           return

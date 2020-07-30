@@ -389,7 +389,6 @@
 
         const scaleBase = Math.round(oCanvas.getBoundingClientRect().width) / 1920
 
-        console.log(scaleBase)
         this.questions.left.forEach((item, index) => {
           item.fontStyle = {
             fontSize: `${18 * scaleBase}px`,

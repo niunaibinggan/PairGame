@@ -4,6 +4,7 @@ import ExportScence from '~/components/game/exportScence'
 import SubmitButton from '~/components/game/submitButton'
 import Panel from '~/components/game/panel'
 import AnswerPanel from '~/components/game/AnswerPanel'
+import Hilo from 'hilojs'
 
 export default async function init (questions) {
   // const  // 接入hilo动画引擎
@@ -42,7 +43,7 @@ export default async function init (questions) {
   })
   stage.addChild(exportScence)
 
-  const { selectedBlock, selectedBlockError, selectedBlockRight, bgBlock, selectedBlockErrorLine } = assets
+  const { searchButon, selectedBlock, selectedBlockError, selectedBlockRight, bgBlock, selectedBlockErrorLine } = assets
 
   // 插入题目 两个板块之间的距离 300 每个背景板的长度 499 106
   const panel = new Panel({
@@ -74,10 +75,30 @@ export default async function init (questions) {
 
   stage.addChild(subBtn)
 
+  const buttons = new Hilo.Container({
+    x: 300,
+    y: 980,
+    width: 160,
+    height: 50,
+    visible: true,
+    isSearch: false
+  })
+
+  console.log(searchButon)
+  new Hilo.Bitmap({
+    visible: true,
+    image: searchButon,
+    rect: [0, 0, 160, 50]
+  }).addTo(buttons)
+
+  stage.addChild(buttons)
+
 
   return new Promise((re) => {
     ticker.nextTick(() => {
-      re(stage.canvas.toDataURL('image/png'))
+      setTimeout(() => {
+        re(stage.canvas.toDataURL('image/png'))
+      }, 1000)
     })
   })
 }

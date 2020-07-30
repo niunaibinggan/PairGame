@@ -17,6 +17,7 @@ export default function () {
     bgBlock: null,
     selectedBlockErrorLine: null,
     answerPanelBg: null,
+    searchButon: null,
 
     async load () {
       const resources = [
@@ -33,7 +34,7 @@ export default function () {
         { id: 'selectedBlockRight', src: require('~/static/right__bg.png') },
         { id: 'bgBlock', src: require('~/static/block.jpg') },
         { id: 'answerPanelBg', src: require('~/static/panel__bg.png') },
-
+        { id: 'searchButon', src: require('~/static/answer__button.png') },
       ]
       this.queue = new Hilo.LoadQueue()
       this.queue.add(resources)
@@ -70,6 +71,7 @@ export default function () {
       this.bgBlock = this.queue.get("bgBlock").content
       this.selectedBlockErrorLine = this.queue.get("selectedBlockErrorLine").content
       this.answerPanelBg = this.queue.get("answerPanelBg").content
+      this.searchButon = this.queue.get("searchButon").content
 
       this.queue.off('complete')
       this.fire('complete')
