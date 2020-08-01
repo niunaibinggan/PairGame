@@ -140,9 +140,8 @@
         questions = localStorage.getItem('questionsConfig')
       }
 
-      if (!questions) return this.$router.replace('/config')
-
-      this.questions = JSON.parse(questions)
+      this.questions = JSON.parse(questions||null)
+      if (!this.questions || this.questions.name!=='pairGame') return this.$router.replace('/config')
 
       this.shuffle(this.questions.left.concat(this.questions.right))
 

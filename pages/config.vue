@@ -130,8 +130,8 @@
       } catch (error) {
         questions = localStorage.getItem('questionsConfig')
       }
-      if (!questions) return
-      this.questions = JSON.parse(questions)
+      questions = JSON.parse(questions||null)
+      if (questions && questions.name === 'pairGame') {this.questions = questions}
     },
     methods: {
       selectItem (type, index) {
@@ -237,6 +237,7 @@
         }
 
         let setQuestion = this.questions
+        setQuestion.name = 'pairGame'
         try {
           this.isWaiting = true
           const thumbnail = await save(setQuestion)

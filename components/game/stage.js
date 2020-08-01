@@ -49,7 +49,7 @@ export default function initStage () {
   }
 
   function init() {
-    console.log('convert touch to mouse');
+    // console.log('convert touch to mouse');
     document.addEventListener("touchstart", touchHandler, true);
     document.addEventListener("touchmove", touchHandler, true);
     document.addEventListener("touchend", touchHandler, true);
