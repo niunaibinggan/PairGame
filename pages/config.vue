@@ -426,7 +426,7 @@
   }
   .root__bottom-contnet {
     max-width: 1000px;
-    margin: 0 auto;
+    margin: 0px 130px;
   }
 
   .root__add {

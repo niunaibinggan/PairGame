@@ -84,7 +84,6 @@ export default async function init (questions) {
     isSearch: false
   })
 
-  console.log(searchButon)
   new Hilo.Bitmap({
     visible: true,
     image: searchButon,
@@ -98,7 +97,7 @@ export default async function init (questions) {
     ticker.nextTick(() => {
       setTimeout(() => {
         re(stage.canvas.toDataURL('image/png'))
-      }, 1000)
+      }, 900)
     })
   })
 }
