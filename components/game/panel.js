@@ -87,7 +87,7 @@ export default class ResultPanel extends Hilo.Container {
 
       let fontSizeY = 60
 
-      if (this.getByte(item.text) > 8 && this.getByte(item.text) < 22) {
+      if (this.getByte(item.text) > 6 && this.getByte(item.text) < 22) {
         fontSize = 38 - (this.getByte(item.text) / 5) * 5
         fontSizeY = 65 - fontSize / 2 + 10
       }
@@ -105,7 +105,7 @@ export default class ResultPanel extends Hilo.Container {
         new Text({
           id,
           text: item.text,
-          lineHeight: this.getByte(item.text) < 8 ? 0 : fontSize + 9,
+          lineHeight: this.getByte(item.text) < 6 ? 0 : fontSize + 9,
           fontSize,
           bold: true,
           textAlign: 'center',

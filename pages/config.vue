@@ -130,8 +130,8 @@
       } catch (error) {
         questions = localStorage.getItem('questionsConfig')
       }
-      questions = JSON.parse(questions||null)
-      if (questions && questions.name === 'pairGame') {this.questions = questions}
+      questions = JSON.parse(questions || null)
+      if (questions && questions.name === 'pairGame') { this.questions = questions }
     },
     methods: {
       selectItem (type, index) {
@@ -461,5 +461,6 @@
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
+    margin-right: 130px;
   }
 </style>
