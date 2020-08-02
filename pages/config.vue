@@ -461,6 +461,6 @@
     border-radius: 4px;
     color: #fff;
     cursor: pointer;
-    margin-right: 130px;
+    /* margin-right: 130px; */
   }
 </style>
