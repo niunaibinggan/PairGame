@@ -129,6 +129,8 @@
         exportScence: null,
         isSearch: true,
         visibleAnswer: true,
+        isWaiting: false,
+        TIMER:null
       }
     },
     async mounted () {
@@ -179,6 +181,12 @@
 
     },
     methods: {
+      changeIsWaiting(){
+        clearTimeout(this.TIMER)
+        this.TIMER = setTimeout(()=>{
+          this.isWaiting = false
+        },250)
+      },
       createButtons () {
         const buttons = new Hilo.Container({
           x: 300,
@@ -201,6 +209,8 @@
 
         this.stage.addChild(buttons)
         buttons.on(Hilo.event.POINTER_START, (e) => {
+          if(this.isWaiting){return false}
+          this.isWaiting=true
           this.visibleAnswer = false
           this.questionsPanelCanvas.visible = false
 
@@ -228,6 +238,8 @@
             this.answerCanvas.getChildAt(1).text = `${this.questions.left.length} / ${this.questions.left.length}`
             this.exportScence.timeStart = false
           }
+
+          this.changeIsWaiting()
         })
         return buttons
       },
@@ -287,6 +299,8 @@
         })
 
         subBtn.on(Hilo.event.POINTER_START, (e) => {
+          if(this.isWaiting){return false}
+          this.isWaiting=true
           this.setAnswer = this.questionsPanelCanvas.setAnswer
           this.isAllRight = (this.setAnswer.length === this.questions.left.length)
           if (!this.isAllRight) {
@@ -312,6 +326,8 @@
             this.questionsPanelCanvas.visible = false
             this.visibleAnswer = true
             // this.questionsPanelCanvas = null
+
+            this.changeIsWaiting()
           }, 2000)
 
         })
@@ -333,7 +349,11 @@
         })
 
         resetButtons.on(Hilo.event.POINTER_START, (e) => {
+          if(this.isWaiting){return false}
+          this.isWaiting=true
           this.resetHandel()
+          
+          this.changeIsWaiting()
         })
         this.stage.addChild(resetButtons)
 
