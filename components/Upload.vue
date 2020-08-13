@@ -41,6 +41,13 @@
           })
           return false
         }
+        if(size>1024*1024){
+            this.$message({
+            message: `图片大小不能超过1M哦`,
+            type: 'warning'
+          })
+          return false
+        }
         const reader = new FileReader()
         reader.readAsDataURL(val[0].file)
         reader.onload = (e) => {
