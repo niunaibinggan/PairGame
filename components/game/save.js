@@ -41,6 +41,7 @@ export default async function init (questions) {
     title: questions.title,
     ticker,
   })
+  exportScence.timeStart = false
   stage.addChild(exportScence)
 
   const { searchButon, selectedBlock, selectedBlockError, selectedBlockRight, bgBlock, selectedBlockErrorLine } = assets

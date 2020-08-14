@@ -130,7 +130,7 @@
         isSearch: true,
         visibleAnswer: true,
         isWaiting: false,
-        TIMER:null
+        TIMER: null
       }
     },
     async mounted () {
@@ -142,8 +142,8 @@
         questions = localStorage.getItem('questionsConfig')
       }
 
-      this.questions = JSON.parse(questions||null)
-      if (!this.questions || this.questions.name!=='pairGame') return this.$router.replace('/config')
+      this.questions = JSON.parse(questions || null)
+      if (!this.questions || this.questions.name !== 'pairGame') return this.$router.replace('/config')
 
       this.shuffle(this.questions.left.concat(this.questions.right))
 
@@ -180,12 +180,18 @@
       this.initWindowOnSize()
 
     },
+    watch: {
+      setAnswer (value) {
+        if (value.length) this.questionsSubmitCanvas.visible = true
+
+      }
+    },
     methods: {
-      changeIsWaiting(){
+      changeIsWaiting () {
         clearTimeout(this.TIMER)
-        this.TIMER = setTimeout(()=>{
+        this.TIMER = setTimeout(() => {
           this.isWaiting = false
-        },250)
+        }, 250)
       },
       createButtons () {
         const buttons = new Hilo.Container({
@@ -209,8 +215,8 @@
 
         this.stage.addChild(buttons)
         buttons.on(Hilo.event.POINTER_START, (e) => {
-          if(this.isWaiting){return false}
-          this.isWaiting=true
+          if (this.isWaiting) { return false }
+          this.isWaiting = true
           this.visibleAnswer = false
           this.questionsPanelCanvas.visible = false
 
@@ -294,13 +300,13 @@
           y: (1080 - 96) / 2 + 430,
           images: this.assets.submitButton,
           rect: [0, 0, 329, 96],
-          visible: true,
+          visible: false,
           alpha: this.setAlpha,
         })
 
         subBtn.on(Hilo.event.POINTER_START, (e) => {
-          if(this.isWaiting){return false}
-          this.isWaiting=true
+          if (this.isWaiting) { return false }
+          this.isWaiting = true
           this.setAnswer = this.questionsPanelCanvas.setAnswer
           this.isAllRight = (this.setAnswer.length === this.questions.left.length)
           if (!this.isAllRight) {
@@ -349,10 +355,10 @@
         })
 
         resetButtons.on(Hilo.event.POINTER_START, (e) => {
-          if(this.isWaiting){return false}
-          this.isWaiting=true
+          if (this.isWaiting) { return false }
+          this.isWaiting = true
           this.resetHandel()
-          
+
           this.changeIsWaiting()
         })
         this.stage.addChild(resetButtons)
@@ -416,7 +422,7 @@
           }
           this.questions.right[index].fontStyle = {
             fontSize: `${18 * scaleBase}px`,
-            top: this.getByte(item.text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(item.text) / 12)}%`,
+            top: this.getByte(this.questions.right[index].text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(this.questions.right[index].text) / 12)}%`,
             transform: `translate(-47%, -50%) scaleY(${scaleBase})`,
           }
         })
@@ -494,6 +500,9 @@
     background-size: 100%;
     text-align: center;
     position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
   }
 
   .answer-item__line {
@@ -522,7 +531,7 @@
   .answer-item__image-img {
     margin: 0 auto;
     width: 90%;
-    height: 98%;
+    height: 80%;
     position: relative;
     left: 2%;
   }

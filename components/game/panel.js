@@ -126,13 +126,15 @@ export default class ResultPanel extends Hilo.Container {
         img.onload = (e) => {
           const realImageWidth = e.path[0].width
           const realImageHeight = e.path[0].height
+          const baseScale = 0.9
           const scale = realImageWidth > realImageHeight ? this.blockRect[2] / realImageWidth : this.blockRect[3] / realImageHeight
+
           new Hilo.Bitmap({
             id,
-            x: realImageWidth > realImageHeight ? 0 : (this.blockRect[2] - realImageWidth * scale) / 2,
-            y: realImageWidth > realImageHeight ? (this.blockRect[3] - realImageHeight * scale) / 2 : 0,
-            width: realImageWidth * scale,
-            height: realImageHeight * scale,
+            x: (this.blockRect[2] - realImageWidth * scale * baseScale) / 2,
+            y: (this.blockRect[3] - realImageHeight * scale * baseScale) / 2,
+            width: realImageWidth * scale * baseScale,
+            height: realImageHeight * scale * baseScale,
             image: item.text,
             visible: true,
           }).addTo(blockContainer)
