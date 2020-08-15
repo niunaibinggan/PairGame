@@ -41,8 +41,15 @@
           })
           return false
         }
-        if(size>1024*1024){
-            this.$message({
+        if (val[0].type !== 'image/jpg' || val[0].type !== 'image/png' || val[0].type !== 'image/jpeg') {
+          this.$message({
+            message: `只支持.png和.jpg格式的图片哦`,
+            type: 'warning'
+          })
+          return false
+        }
+        if (size > 1024 * 1024) {
+          this.$message({
             message: `图片大小不能超过1M哦`,
             type: 'warning'
           })
