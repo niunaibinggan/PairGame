@@ -206,7 +206,7 @@
 
         if (this.getByte(this.questions.title) > 25) {
           this.$message({
-            message: `最多输入25个字符`,
+            message: `标题最多输入25个字符`,
             type: 'warning'
           })
           return
@@ -216,7 +216,7 @@
 
         if (textFilter.length) {
           this.$message({
-            message: `最多输入15个字符`,
+            message: `每题最多输入15个字符`,
             type: 'warning'
           })
           return
