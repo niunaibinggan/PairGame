@@ -416,14 +416,14 @@
 
         this.questions.left.forEach((item, index) => {
           item.fontStyle = {
-            fontSize: `${18 * scaleBase}px`,
+            fontSize: `${30 * scaleBase}px`,
             top: this.getByte(item.text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(item.text) / 12)}%`,
-            transform: `translate(-47%, -50%) scaleY(${scaleBase})`,
+            transform: `translate(-47%, -50%) scale(${scaleBase})`,
           }
           this.questions.right[index].fontStyle = {
-            fontSize: `${18 * scaleBase}px`,
+            fontSize: `${30 * scaleBase}px`,
             top: this.getByte(this.questions.right[index].text) < 14 ? '50%' : `${50 - Math.ceil(this.getByte(this.questions.right[index].text) / 12)}%`,
-            transform: `translate(-47%, -50%) scaleY(${scaleBase})`,
+            transform: `translate(-47%, -50%) scale(${scaleBase})`,
           }
         })
 
