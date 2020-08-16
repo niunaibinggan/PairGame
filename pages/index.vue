@@ -369,7 +369,7 @@
       resetHandel () {
         this.questionsResetCanvas.visible = false
         this.stage.removeChild(this.answerCanvas)
-        this.questionsSubmitCanvas.visible = true
+        this.questionsSubmitCanvas.visible = false
         this.buttonsCanvas.visible = true
         // 重置基础信息
         this.setAnswer = []
