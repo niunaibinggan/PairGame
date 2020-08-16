@@ -212,11 +212,21 @@
           return
         }
 
-        const textFilter = this.questions.left.concat(this.questions.right).filter(item => (item.type === 'text' && this.getByte(item.text) > 15))
+        let indexList = ''
+        this.questions.left.filter((item,index) => {
+          const leftRule=item.type === 'text' && this.getByte(item.text) > 15
+          const rightItem=this.questions.right[index]
+          const rightRule=rightItem.type === 'text' && this.getByte(rightItem.text) > 15
+          if( leftRule || rightRule ){
+            indexList += indexList ? `、${index+1}` :`${index+1}`
+          }
 
-        if (textFilter.length) {
+          return (item.type === 'text' && this.getByte(item.text)>15)
+          })
+
+        if (indexList) {
           this.$message({
-            message: `每题最多输入15个字符`,
+            message: `第${indexList}题超过字符限制字数，每题最多输入15个字符`,
             type: 'warning'
           })
           return
