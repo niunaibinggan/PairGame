@@ -206,7 +206,7 @@
 
         if (this.getByte(this.questions.title) > 25) {
           this.$message({
-            message: `标题最多输入25个字符`,
+            message: `标题最多输入25个字符!(1个汉字视为2个字符)`,
             type: 'warning'
           })
           return
@@ -226,7 +226,7 @@
 
         if (indexList) {
           this.$message({
-            message: `第${indexList}题超过字符限制字数，每题最多输入15个字符`,
+            message: `第${indexList}题超过字符限制字数，每题最多输入15个字符!(1个汉字视为2个字符)`,
             type: 'warning'
           })
           return
