@@ -1,5 +1,5 @@
 <template>
-  <div class="root">
+  <div class="root" onselectstart="return false">
     <div class="container"
          ref="container"></div>
 
