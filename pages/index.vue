@@ -229,9 +229,10 @@
           this.setAnswer = []
           this.errorAnswerLeft = []
           this.errorAnswerRight = []
+          this.questionsSubmitCanvas.visible = false
 
           if (this.isSearch) {
-            this.questionsSubmitCanvas.visible = true
+            // this.questionsSubmitCanvas.visible = true
             this.answerCanvas.getChildAt(1).text = `0 / ${this.questions.left.length}`
             this.exportScence.timeCount = 0
             this.exportScence.timeStart = true
@@ -240,7 +241,7 @@
             this.stage.removeChild(this.questionsPanelCanvas)
             this.questionsPanelCanvas = this.createPanel()
           } else {
-            this.questionsSubmitCanvas.visible = false
+            // this.questionsSubmitCanvas.visible = false
             this.answerCanvas.getChildAt(1).text = `${this.questions.left.length} / ${this.questions.left.length}`
             this.exportScence.timeStart = false
           }
