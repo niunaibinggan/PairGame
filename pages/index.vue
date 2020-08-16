@@ -234,7 +234,7 @@
           if (this.isSearch) {
             // this.questionsSubmitCanvas.visible = true
             this.answerCanvas.getChildAt(1).text = `0 / ${this.questions.left.length}`
-            this.exportScence.timeCount = 0
+            this.exportScence.timeCount = -1
             this.exportScence.timeStart = true
 
             // 重置后创建
@@ -381,7 +381,7 @@
         this.questionsPanelCanvas = this.createPanel()
         this.answerCanvas = this.createAnswer()
 
-        this.exportScence.timeCount = 0
+        this.exportScence.timeCount = -1
 
         this.exportScence.timeStart = true
 
