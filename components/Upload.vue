@@ -41,7 +41,7 @@
           })
           return false
         }
-        if (val[0].type !== 'image/jpg' || val[0].type !== 'image/png' || val[0].type !== 'image/jpeg') {
+        if ( ['image/jpg','image/png','image/jpeg'].indexOf(val[0].type) < 0 ) {
           this.$message({
             message: `只支持.png和.jpg格式的图片哦`,
             type: 'warning'
